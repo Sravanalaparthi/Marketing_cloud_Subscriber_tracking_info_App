@@ -1,0 +1,80 @@
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px;
+  }
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+</style>
+<h2>Subscriber Details
+</h2>
+<table>
+  %%[
+    /*Declare Variables*/
+    var @SubscriberKey,@Sends,@Opens, @Clicks,@Bounces, @Lists
+    /*Get Subscriber in content from url*/
+    Set @SubscriberKey = RequestParameter("SubscriberKey")
+    
+]%%
+  <script runat="server">
+    Platform.Load("Core","1.1.1");
+    try{
+      //Get subscriberKey retrived by AMPscript from URL parameter
+      var SubscriberKey= Variable.GetValue("@SubscriberKey");
+
+      //Set filter for retrieval of tracking data
+      var filter = {
+        Property: "SubscriberKey", 
+        SimpleOperator: "equals", 
+        Value: SubscriberKey
+      };
+      //Set columns to retrieve
+      var cols = ["SubscriberKey","EmailAddress","Status","UnsubscribedDate","EmailTypePreference","CreatedDate"];
+      //Logic for send count begins
+      //Initiate WSProxy and set object properties
+      var subprox = new Script.Util.WSProxy(),
+          objectType = "Subscriber",
+          moreData = false,
+          reqID = null,
+          numItems = 0;
+      //Get subscriber details
+      var subdata = subprox.retrieve(objectType, cols, filter);
+      if(subdata != null) {
+        for(var i=0; i< subdata.Results.length; i++) {
+          Write("<tr>");
+          Write("<td>" + "SubscriberKey" + "</td>");
+          Write("<td>" + subdata.Results[i].SubscriberKey + "</td>");
+          Write("</tr>");
+          Write("<tr>");
+          Write("<td>" + "EmailAddress" + "</td>");
+          Write("<td>" + subdata.Results[i].EmailAddress + "</td>");
+          Write("</tr>");
+          Write("<tr>");
+          Write("<td>" + "Status" + "</td>");
+          Write("<td>" + subdata.Results[i].Status + "</td>");
+          Write("</tr>");
+          Write("<tr>");
+          Write("<td>" + "UnsubscribedDate" + "</td>");
+          Write("<td>" + subdata.Results[i].UnsubscribedDate + "</td>");
+          Write("</tr>");
+          Write("<tr>");
+          Write("<td>" + "EmailTypePreference" + "</td>");
+          Write("<td>" + subdata.Results[i].EmailTypePreference + "</td>");
+          Write("</tr>");
+          Write("<tr>");
+          Write("<td>" + "CreatedDate" + "</td>");
+          Write("<td>" + subdata.Results[i].CreatedDate + "</td>");
+          Write("</tr>");
+        }
+      }
+    }
+    catch(e){
+      Write(Stringify(e));
+    }
+  </script>
+</table>
